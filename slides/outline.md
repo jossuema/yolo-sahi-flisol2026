@@ -100,6 +100,26 @@
 
 ---
 
+## BLOQUE 2.5 — SAHI más allá de las cajas: segmentación (5 min)
+
+### Slide 13b — Detección vs segmentación de instancias
+- Recordatorio: detección = cajas; **segmentación de instancias = máscara por objeto** (contorno a nivel de píxel).
+- YOLO también tiene variante **-seg** (`yolo11s-seg.pt`), open source.
+- Mismo talón de Aquiles: en objetos pequeños la máscara es burda o no existe.
+
+### Slide 13c — SAHI con segmentación
+- SAHI funciona **igual** con modelos de segmentación: cada slice produce máscaras a resolución nativa y se fusionan.
+- En código solo cambia el modelo (`yolo11s-seg.pt`); el resto del pipeline es idéntico.
+  ```python
+  seg = AutoDetectionModel.from_pretrained(model_type='ultralytics', model_path='yolo11s-seg.pt')
+  result = get_sliced_prediction(img, seg, slice_height=640, slice_width=640, overlap_height_ratio=0.2)
+  ```
+- **Figura:** `outputs/segmentation/seg_*.jpg` (máscaras YOLO-seg vs YOLO-seg+SAHI).
+- Mensaje: *"SAHI no es solo para cajas; mejora también las máscaras de instancias pequeñas."*
+- Nota honesta: VisDrone no trae máscaras de ground truth, así que esto se muestra **cualitativamente** (no medimos mAP de segmentación). El benchmark mAP es sobre detección.
+
+---
+
 ## BLOQUE 3 — Demo y caso de estudio (8 min)
 
 ### Slide 14 — Caso de estudio: seguridad ciudadana
@@ -145,6 +165,10 @@
 ### Slide 20 — Donde SAHI brilla: objetos pequeños
 - **Figura:** `02_ap_por_tamano.png` (AP_small / medium / large).
 - Mensaje central: *"El salto grande está en AP_small. SAHI es para objetos pequeños."*
+
+### Slide 20b — ¿En qué clases ayuda más? (caso seguridad ciudadana)
+- **Figura:** `05_per_class.png` (detecciones por clase, YOLO vs SAHI).
+- Resaltar el salto en **pedestrian / people / motor** — justo las clases del caso de uso.
 
 ### Slide 21 — El costo: precisión vs velocidad
 - **Figura:** `03_slice_tradeoff.png` (detecciones y tiempo vs tamaño de slice).
@@ -209,10 +233,12 @@
 | Slide | Figura | Script |
 |---|---|---|
 | 8 | `00_pipeline_sahi.png` | `figures.py` |
+| 13 | `04_postprocess.png` | `compare_postprocess.py` → `figures.py` |
+| 13c | `segmentation/seg_*.jpg` | `segment.py` |
+| 17 | `gallery/*.jpg` | `gallery.py` |
 | 19 | `01_map_comparison.png` | `evaluate.py` → `figures.py` |
 | 20 | `02_ap_por_tamano.png` | `evaluate.py` → `figures.py` |
+| 20b | `05_per_class.png` | `analyze_classes.py` → `figures.py` |
 | 21 | `03_slice_tradeoff.png` | `slice_sweep.py` → `figures.py` |
-| 13 | `04_postprocess.png` | `compare_postprocess.py` → `figures.py` |
-| 17 | `gallery/*.jpg` | `gallery.py` |
 
 Genera todo de una con `notebooks/02_resultados_figuras.ipynb`.

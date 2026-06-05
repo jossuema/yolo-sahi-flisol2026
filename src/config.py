@@ -25,6 +25,9 @@ VISDRONE_VAL_URL = (
 MODEL_PATH = str(WEIGHTS_DIR / "visdrone_yolo11s.pt")
 # Fallback rápido (sin entrenar) solo para la galería visual cualitativa:
 FALLBACK_MODEL = "yolo11s.pt"
+# Modelo de SEGMENTACIÓN de instancias (COCO-pretrained; VisDrone no trae máscaras,
+# así que la segmentación se muestra de forma cualitativa sobre la imagen).
+SEG_MODEL = "yolo11s-seg.pt"
 CONFIDENCE = 0.25
 DEVICE = "cuda:0"  # usa "cpu" si no hay GPU
 

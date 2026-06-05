@@ -36,9 +36,11 @@ Imagen ──► [slice][slice][slice] ──► YOLO en cada slice ──► me
 | 3. Benchmark mAP | `src/evaluate.py` | genera los números clave |
 | 4. Barrido de slice | `src/slice_sweep.py` | trade-off precisión/velocidad |
 | 5. Comparar postproceso | `src/compare_postprocess.py` | NMS vs NMM vs GREEDYNMM |
-| 6. Galería visual | `src/gallery.py` | imágenes antes/después |
-| 7. Figuras para slides | `src/figures.py` | PNG de alta resolución |
-| 8. (Bonus) Video | `src/pipeline_video.py` | con tu propio clip urbano |
+| 6. Análisis por clase | `src/analyze_classes.py` | personas, motos, vehículos |
+| 7. Segmentación | `src/segment.py` | máscaras YOLO-seg + SAHI (cualitativo) |
+| 8. Galería visual | `src/gallery.py` | imágenes antes/después |
+| 9. Figuras para slides | `src/figures.py` | PNG de alta resolución |
+| 10. (Bonus) Video | `src/pipeline_video.py` | con tu propio clip urbano |
 
 > **Atajo sin entrenar:** la galería (`gallery.py`) funciona con `yolo11s.pt` (COCO) y ya muestra el efecto visual del slicing. El **mAP real** sí requiere el modelo entrenado en VisDrone (las clases deben coincidir con el ground truth).
 
@@ -48,10 +50,16 @@ Imagen ──► [slice][slice][slice] ──► YOLO en cada slice ──► me
 
 ### Google Colab (recomendado — GPU gratis)
 
+- [`notebooks/00_entrenamiento.ipynb`](notebooks/00_entrenamiento.ipynb) — **fine-tune en VisDrone** (paso previo para el mAP real).
 - [`notebooks/01_demo_colab.ipynb`](notebooks/01_demo_colab.ipynb) — demo en vivo de la charla.
 - [`notebooks/02_resultados_figuras.ipynb`](notebooks/02_resultados_figuras.ipynb) — genera todas las figuras para las slides.
 
 Abre en Colab, activa GPU (T4) y ejecuta en orden.
+
+> ⚠️ **El mAP requiere entrenar primero.** Evaluar un modelo COCO (`yolo11s.pt`, 80 clases)
+> contra el ground truth de VisDrone (10 clases) da mAP ≈ 0 porque los `category_id` no coinciden
+> (*zero-shot*). Corre `00_entrenamiento.ipynb` antes que `02_resultados_figuras.ipynb`.
+> `evaluate.py` ahora avisa automáticamente si detecta esta desalineación.
 
 ### Local
 
@@ -85,6 +93,8 @@ python src/figures.py                          # 7. figuras para slides
 │   ├── evaluate.py                # ⭐ Benchmark mAP: YOLO vs YOLO+SAHI
 │   ├── slice_sweep.py             # Trade-off tamaño de slice (detección/tiempo)
 │   ├── compare_postprocess.py     # NMS vs NMM vs GREEDYNMM
+│   ├── analyze_classes.py         # Detecciones por clase (personas, motos...)
+│   ├── segment.py                 # Segmentación de instancias YOLO-seg + SAHI
 │   ├── gallery.py                 # Comparativas visuales antes/después
 │   ├── figures.py                 # Figuras PNG de alta resolución para slides
 │   └── pipeline_video.py          # (Bonus) inferencia sobre video
@@ -119,7 +129,9 @@ Figuras para slides (`outputs/figures/`, 200 DPI):
 - `02_ap_por_tamano.png` — AP por tamaño (el gráfico estrella)
 - `03_slice_tradeoff.png` — precisión vs velocidad
 - `04_postprocess.png` — NMS vs NMM vs GREEDYNMM
-- `outputs/gallery/*.jpg` — comparativas antes/después
+- `05_per_class.png` — detecciones por clase (personas, motos...)
+- `outputs/gallery/*.jpg` — comparativas de detección antes/después
+- `outputs/segmentation/seg_*.jpg` — comparativas de segmentación antes/después
 
 > Genera todo de una con `notebooks/02_resultados_figuras.ipynb`. Commitea los resultados para tenerlos a mano aunque falle el internet en la sala.
 

@@ -41,6 +41,33 @@ def build_model(model_path: str):
     )
 
 
+def model_num_classes(det_model) -> int | None:
+    """Número de clases del modelo cargado (para detectar desalineación)."""
+    for attr in ("category_mapping",):
+        m = getattr(det_model, attr, None)
+        if m:
+            return len(m)
+    inner = getattr(det_model, "model", None)
+    names = getattr(inner, "names", None)
+    return len(names) if names else None
+
+
+def check_class_alignment(det_model, coco_gt: COCO):
+    """Avisa si el modelo NO está alineado con el dataset (causa típica de mAP~0)."""
+    n_model = model_num_classes(det_model)
+    n_gt = len(coco_gt.getCatIds())
+    if n_model is not None and n_model != n_gt:
+        print("\n" + "!" * 70)
+        print(f"⚠️  ADVERTENCIA: el modelo tiene {n_model} clases pero el ground truth")
+        print(f"    de VisDrone tiene {n_gt}. Los category_id NO coinciden, así que el")
+        print(f"    mAP saldrá ~0 (estás evaluando en ZERO-SHOT con un modelo COCO).")
+        print(f"    👉 Entrena en VisDrone primero: notebooks/00_entrenamiento.ipynb")
+        print(f"       o  python src/train_visdrone.py  y usa weights/visdrone_yolo11s.pt")
+        print("!" * 70 + "\n")
+        return False
+    return True
+
+
 def coco_eval(coco_gt: COCO, predictions: list) -> dict:
     """Evalúa una lista de predicciones COCO y devuelve las 6 métricas clave."""
     if not predictions:
@@ -57,6 +84,7 @@ def coco_eval(coco_gt: COCO, predictions: list) -> dict:
 def run(model_path: str, limit: int | None):
     coco_gt = COCO(str(config.COCO_GT_PATH))
     model = build_model(model_path)
+    check_class_alignment(model, coco_gt)
 
     img_ids = sorted(coco_gt.getImgIds())
     if limit:

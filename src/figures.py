@@ -140,6 +140,26 @@ def fig_postprocess(csv=None):
     _save(fig, "04_postprocess.png")
 
 
+def fig_per_class(csv=None):
+    """Barras horizontales: detecciones por clase, YOLO vs YOLO+SAHI."""
+    csv = csv or config.OUTPUTS_DIR / "per_class.csv"
+    if not Path(csv).exists():
+        print(f"(omito por-clase: falta {csv} — corre src/analyze_classes.py)")
+        return
+    df = pd.read_csv(csv).sort_values("YOLO+SAHI")
+    y = range(len(df))
+    h = 0.38
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.barh([i + h / 2 for i in y], df["YOLO"], h, label="YOLO", color=C_YOLO)
+    ax.barh([i - h / 2 for i in y], df["YOLO+SAHI"], h, label="YOLO + SAHI", color=C_SAHI)
+    ax.set_yticks(list(y))
+    ax.set_yticklabels(df["clase"])
+    ax.set_xlabel("Detecciones totales")
+    ax.set_title("Detecciones por clase — dónde más ayuda SAHI")
+    ax.legend()
+    _save(fig, "05_per_class.png")
+
+
 def fig_pipeline_diagram():
     """Diagrama esquemático del pipeline de slicing de SAHI."""
     fig, ax = plt.subplots(figsize=(12, 4))
@@ -184,6 +204,7 @@ def all_figures():
     fig_apsmall_focus()
     fig_slice_tradeoff()
     fig_postprocess()
+    fig_per_class()
     print("Listo.")
 
 
