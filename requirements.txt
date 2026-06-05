@@ -1,0 +1,18 @@
+# Core
+ultralytics>=8.3.0      # YOLO11 / YOLOv8
+sahi>=0.11.20           # Slicing Aided Hyper Inference
+
+# Visión y visualización
+opencv-python>=4.9.0
+supervision>=0.20.0     # anotaciones limpias (Roboflow)
+matplotlib>=3.8.0
+pillow>=10.0.0
+
+# Métricas y datos
+pandas>=2.0.0
+numpy>=1.24.0
+pycocotools>=2.0.7      # mAP / evaluación COCO
+
+# Utilidades
+tqdm>=4.66.0
+requests>=2.31.0

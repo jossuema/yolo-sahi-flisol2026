@@ -1,0 +1,24 @@
+# Modelos descargados
+*.pt
+*.onnx
+*.engine
+
+# Datos pesados (descargar con scripts/download_samples.py)
+data/samples/*
+data/videos/*
+!data/samples/.gitkeep
+!data/videos/.gitkeep
+
+# Salidas generadas
+outputs/*
+!outputs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
