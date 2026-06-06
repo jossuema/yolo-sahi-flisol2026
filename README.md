@@ -90,7 +90,9 @@ python src/figures.py                          # 7. figuras para slides
 │   ├── config.py                  # Parámetros: modelo, clases, slices
 │   ├── datasets.py                # VisDrone -> COCO ground truth
 │   ├── train_visdrone.py          # Fine-tune YOLO11 en VisDrone
-│   ├── evaluate.py                # ⭐ Benchmark mAP: YOLO vs YOLO+SAHI
+│   ├── evaluate.py                # ⭐ Benchmark mAP + AP por clase: YOLO vs SAHI
+│   ├── stats_dataset.py           # Estadísticas del dataset (tamaños, densidad, clases)
+│   ├── viz_slices.py              # Visualiza la rejilla de slices con/sin overlap
 │   ├── slice_sweep.py             # Trade-off tamaño de slice (detección/tiempo)
 │   ├── compare_postprocess.py     # NMS vs NMM vs GREEDYNMM
 │   ├── analyze_classes.py         # Detecciones por clase (personas, motos...)
@@ -130,6 +132,11 @@ Figuras para slides (`outputs/figures/`, 200 DPI):
 - `03_slice_tradeoff.png` — precisión vs velocidad
 - `04_postprocess.png` — NMS vs NMM vs GREEDYNMM
 - `05_per_class.png` — detecciones por clase (personas, motos...)
+- `06_size_distribution.png` — distribución de tamaños de objeto (mayoría small)
+- `07_objects_per_image.png` — densidad de objetos por imagen
+- `08_class_distribution.png` — frecuencia de clases en el GT
+- `09_slice_grid.png` — distribución de slices con/sin overlap
+- `10_per_class_ap.png` — AP por clase (YOLO vs SAHI)
 - `outputs/gallery/*.jpg` — comparativas de detección antes/después
 - `outputs/segmentation/seg_*.jpg` — comparativas de segmentación antes/después
 

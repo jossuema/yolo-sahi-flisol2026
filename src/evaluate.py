@@ -81,6 +81,21 @@ def coco_eval(coco_gt: COCO, predictions: list) -> dict:
     return dict(zip(STAT_NAMES, ev.stats[:6]))
 
 
+def per_class_ap(coco_gt: COCO, predictions: list) -> dict:
+    """AP@.5:.95 por cada clase (para ver dónde gana SAHI)."""
+    out = {c["id"]: 0.0 for c in coco_gt.loadCats(coco_gt.getCatIds())}
+    if not predictions:
+        return out
+    coco_dt = coco_gt.loadRes(predictions)
+    for cid in coco_gt.getCatIds():
+        ev = COCOeval(coco_gt, coco_dt, "bbox")
+        ev.params.catIds = [cid]
+        with contextlib.redirect_stdout(io.StringIO()):
+            ev.evaluate(); ev.accumulate(); ev.summarize()
+        out[cid] = float(ev.stats[0])
+    return out
+
+
 def run(model_path: str, limit: int | None):
     coco_gt = COCO(str(config.COCO_GT_PATH))
     model = build_model(model_path)
@@ -130,9 +145,23 @@ def run(model_path: str, limit: int | None):
         json.dumps({"yolo": m_std, "yolo_sahi": m_sahi, "n_images": len(img_ids)}, indent=2)
     )
 
+    # --- AP por clase (reutiliza las predicciones ya calculadas) ---
+    ap_std = per_class_ap(coco_gt, preds_std)
+    ap_sahi = per_class_ap(coco_gt, preds_sahi)
+    id2name = {c["id"]: c["name"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
+    df_cls = pd.DataFrame([
+        {"clase": id2name[cid],
+         "AP_YOLO": round(ap_std[cid], 4),
+         "AP_YOLO+SAHI": round(ap_sahi[cid], 4)}
+        for cid in coco_gt.getCatIds()
+    ])
+    df_cls.to_csv(config.OUTPUTS_DIR / "per_class_ap.csv", index=False)
+
     print(f"\n=== BENCHMARK mAP — VisDrone val ({len(img_ids)} imágenes) ===")
     print(df.to_string(index=False))
-    print(f"\nGuardado en {out_csv}")
+    print("\n--- AP por clase ---")
+    print(df_cls.to_string(index=False))
+    print(f"\nGuardado en {out_csv} y per_class_ap.csv")
     print("\n👉 Mira AP_small: ahí SAHI da el mayor salto (objetos diminutos aéreos).")
     return df
 

@@ -41,6 +41,12 @@
 - **Figura:** ejemplo real donde YOLO se pierde la mitad de las motos/personas.
 - Frase ancla: *"No es que YOLO sea malo; es que le estamos dando la imagen aplastada."*
 
+### Slide 5b — Evidencia: el dataset es casi todo "objetos pequeños"
+- **Figura:** `06_size_distribution.png` (histograma de √área con umbrales COCO 32/96 px).
+- Dato de impacto: *"el X% de los objetos de VisDrone son < 32 px"* (small).
+- **Figura:** `07_objects_per_image.png` — densidad altísima (promedio N objetos/imagen).
+- Conclusión: este es exactamente el escenario donde YOLO clásico colapsa y SAHI ayuda.
+
 ### Slide 6 — ¿Dónde duele esto en la vida real?
 - Seguridad ciudadana (cámaras urbanas, drones).
 - Tráfico, conteo de personas, agricultura de precisión, inspección aérea, satélite.
@@ -73,6 +79,11 @@
 - Sin solape, un objeto en el borde se **parte en dos** y ninguna mitad se detecta bien.
 - El solape garantiza que cada objeto aparezca completo en al menos un slice.
 - Trade-off: más solape → más slices redundantes → más lento.
+
+### Slide 10b — Cómo se reparten los slices (visual)
+- **Figura:** `09_slice_grid.png` (rejilla de slices con overlap 0.0 / 0.2 / 0.4 sobre una imagen real).
+- Las zonas oscuras = solapamiento. Se ve cómo sube el nº de slices con el overlap.
+- Mensaje: *"el overlap es el seguro contra objetos cortados por el borde del slice."*
 
 ### Slide 11 — Modos de inferencia de SAHI
 - **Standard prediction**: imagen completa, sin cortar (= YOLO normal). Bueno para objetos grandes.
@@ -167,8 +178,9 @@
 - Mensaje central: *"El salto grande está en AP_small. SAHI es para objetos pequeños."*
 
 ### Slide 20b — ¿En qué clases ayuda más? (caso seguridad ciudadana)
-- **Figura:** `05_per_class.png` (detecciones por clase, YOLO vs SAHI).
+- **Figura:** `05_per_class.png` (detecciones por clase) y `10_per_class_ap.png` (AP por clase).
 - Resaltar el salto en **pedestrian / people / motor** — justo las clases del caso de uso.
+- `05` = cuántos objetos más encuentra; `10` = cuánto mejora la precisión (AP) por clase.
 
 ### Slide 21 — El costo: precisión vs velocidad
 - **Figura:** `03_slice_tradeoff.png` (detecciones y tiempo vs tamaño de slice).
@@ -232,13 +244,16 @@
 
 | Slide | Figura | Script |
 |---|---|---|
+| 5b | `06_size_distribution.png`, `07_objects_per_image.png` | `stats_dataset.py` |
 | 8 | `00_pipeline_sahi.png` | `figures.py` |
+| 10b | `09_slice_grid.png` | `viz_slices.py` |
 | 13 | `04_postprocess.png` | `compare_postprocess.py` → `figures.py` |
 | 13c | `segmentation/seg_*.jpg` | `segment.py` |
+| 14 | `08_class_distribution.png` | `stats_dataset.py` |
 | 17 | `gallery/*.jpg` | `gallery.py` |
 | 19 | `01_map_comparison.png` | `evaluate.py` → `figures.py` |
 | 20 | `02_ap_por_tamano.png` | `evaluate.py` → `figures.py` |
-| 20b | `05_per_class.png` | `analyze_classes.py` → `figures.py` |
+| 20b | `05_per_class.png`, `10_per_class_ap.png` | `analyze_classes.py` / `evaluate.py` → `figures.py` |
 | 21 | `03_slice_tradeoff.png` | `slice_sweep.py` → `figures.py` |
 
 Genera todo de una con `notebooks/02_resultados_figuras.ipynb`.

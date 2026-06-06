@@ -160,6 +160,26 @@ def fig_per_class(csv=None):
     _save(fig, "05_per_class.png")
 
 
+def fig_per_class_ap(csv=None):
+    """Barras horizontales: AP@.5:.95 por clase, YOLO vs YOLO+SAHI."""
+    csv = csv or config.OUTPUTS_DIR / "per_class_ap.csv"
+    if not Path(csv).exists():
+        print(f"(omito AP por-clase: falta {csv} — corre src/evaluate.py)")
+        return
+    df = pd.read_csv(csv).sort_values("AP_YOLO+SAHI")
+    y = range(len(df))
+    h = 0.38
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.barh([i + h / 2 for i in y], df["AP_YOLO"], h, label="YOLO", color=C_YOLO)
+    ax.barh([i - h / 2 for i in y], df["AP_YOLO+SAHI"], h, label="YOLO + SAHI", color=C_SAHI)
+    ax.set_yticks(list(y))
+    ax.set_yticklabels(df["clase"])
+    ax.set_xlabel("AP@.5:.95")
+    ax.set_title("AP por clase — YOLO vs YOLO + SAHI")
+    ax.legend()
+    _save(fig, "10_per_class_ap.png")
+
+
 def fig_pipeline_diagram():
     """Diagrama esquemático del pipeline de slicing de SAHI."""
     fig, ax = plt.subplots(figsize=(12, 4))
@@ -205,6 +225,7 @@ def all_figures():
     fig_slice_tradeoff()
     fig_postprocess()
     fig_per_class()
+    fig_per_class_ap()
     print("Listo.")
 
 

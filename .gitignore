@@ -3,15 +3,22 @@
 *.onnx
 *.engine
 
-# Datos pesados (descargar con scripts/download_samples.py)
-data/samples/*
-data/videos/*
-!data/samples/.gitkeep
-!data/videos/.gitkeep
+# Datos pesados (se descargan con scripts/download_visdrone.py)
+data/*
+!data/.gitkeep
 
 # Salidas generadas
 outputs/*
 !outputs/.gitkeep
+
+# Artefactos de render del deck (QA)
+slides/*.pdf
+slides/slide-*.jpg
+slides/slide-*.png
+
+# Pesos entrenados
+weights/*
+!weights/.gitkeep
 
 # Python
 __pycache__/
