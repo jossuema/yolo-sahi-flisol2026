@@ -401,6 +401,91 @@ sectionDivider("04", "Configuraciones", "Escalando por complejidad: de un parám
   footer(s, false);
 })();
 
+// N3b — Tecnicas de fusion (deep dive)
+(function () {
+  const s = contentSlide();
+  kicker(s, "Nivel 3 · En profundidad", C.gold); levelTag(s, 3);
+  title(s, "Fusión: ¿suprimir o combinar?");
+  s.addText("El solape hace que un mismo objeto aparezca en varias cajas. Hay tres formas de resolver los duplicados:",
+    { x: 0.7, y: 1.92, w: 12, h: 0.4, fontFace: BFONT, fontSize: 14, color: C.ink, margin: 0 });
+
+  const cards = [
+    { name: "NMS", sub: "Non-Maximum Suppression", kind: "sup", desc: "Conserva la caja de mayor score y descarta las que se solapan demasiado.", tag: "Rápido · puede borrar vecinos", col: C.navy },
+    { name: "NMM", sub: "Non-Maximum Merging", kind: "mrg", desc: "En vez de descartar, fusiona las cajas solapadas en una sola.", tag: "Mejor para objetos partidos", col: C.navy },
+    { name: "GREEDYNMM", sub: "Greedy NMM", kind: "grd", desc: "NMM en cascada, de mayor a menor score. Valor por defecto de SAHI.", tag: "Buen balance general", col: C.sahi },
+  ];
+  cards.forEach((c, i) => {
+    const x = 0.7 + i * 4.15, y = 2.45, w = 3.85, h = 4.05;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, fill: { color: C.white }, line: { color: C.line, width: 1 }, rectRadius: 0.08, shadow: mkShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.9, fill: { color: c.col }, line: { color: c.col } });
+    s.addText(c.name, { x: x + 0.25, y: y + 0.1, w: w - 0.5, h: 0.45, fontFace: HFONT, fontSize: 18, bold: true, color: C.white, margin: 0 });
+    s.addText(c.sub, { x: x + 0.25, y: y + 0.55, w: w - 0.5, h: 0.3, fontFace: BFONT, fontSize: 10.5, color: "CADCFC", margin: 0 });
+    const cx = x + 0.45, cy = y + 1.1, cw = w - 0.9, ch = 1.25;
+    s.addShape(pres.shapes.RECTANGLE, { x: cx, y: cy, w: cw, h: ch, fill: { color: C.panel }, line: { color: C.line, width: 1 } });
+    if (c.kind === "sup") {
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.35, y: cy + 0.3, w: 1.25, h: 0.65, fill: { color: C.sahi, transparency: 70 }, line: { color: C.sahi, width: 2 } });
+      s.addText("0.91 ✓", { x: cx + 0.2, y: cy + 0.08, w: 1.55, h: 0.2, align: "center", fontFace: BFONT, fontSize: 9, bold: true, color: C.sahi, margin: 0 });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 1.2, y: cy + 0.55, w: 1.25, h: 0.55, fill: { color: C.white, transparency: 100 }, line: { color: C.yolo, width: 1.5, dashType: "dash" } });
+      s.addText("0.86 ✕", { x: cx + 1.1, y: cy + ch - 0.22, w: 1.5, h: 0.2, align: "center", fontFace: BFONT, fontSize: 9, bold: true, color: C.yolo, margin: 0 });
+    } else if (c.kind === "mrg") {
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.35, y: cy + 0.3, w: 1.2, h: 0.65, fill: { color: C.white, transparency: 100 }, line: { color: C.mute, width: 1, dashType: "dash" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 1.15, y: cy + 0.5, w: 1.2, h: 0.55, fill: { color: C.white, transparency: 100 }, line: { color: C.mute, width: 1, dashType: "dash" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.35, y: cy + 0.3, w: 2.0, h: 0.75, fill: { color: C.sahi, transparency: 60 }, line: { color: C.sahi, width: 2.5 } });
+      s.addText("→ una sola caja", { x: cx, y: cy + ch - 0.22, w: cw, h: 0.2, align: "center", fontFace: BFONT, fontSize: 9, bold: true, color: C.sahi, margin: 0 });
+    } else {
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.3, y: cy + 0.32, w: 0.95, h: 0.55, fill: { color: C.white, transparency: 100 }, line: { color: C.mute, width: 1, dashType: "dash" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.85, y: cy + 0.42, w: 0.95, h: 0.55, fill: { color: C.white, transparency: 100 }, line: { color: C.mute, width: 1, dashType: "dash" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 1.4, y: cy + 0.3, w: 0.95, h: 0.55, fill: { color: C.white, transparency: 100 }, line: { color: C.mute, width: 1, dashType: "dash" } });
+      s.addShape(pres.shapes.RECTANGLE, { x: cx + 0.3, y: cy + 0.3, w: 2.05, h: 0.75, fill: { color: C.sahi, transparency: 60 }, line: { color: C.sahi, width: 2.5 } });
+      s.addText("ordena por score → fusiona", { x: cx, y: cy + ch - 0.22, w: cw, h: 0.2, align: "center", fontFace: BFONT, fontSize: 8.5, bold: true, color: C.sahi, margin: 0 });
+    }
+    s.addText(c.desc, { x: x + 0.25, y: y + 2.55, w: w - 0.5, h: 1.0, fontFace: BFONT, fontSize: 12.5, color: C.ink, margin: 0 });
+    s.addText(c.tag, { x: x + 0.25, y: y + 3.55, w: w - 0.5, h: 0.35, fontFace: BFONT, fontSize: 11, italic: true, bold: true, color: c.col === C.sahi ? C.sahi : C.blue, margin: 0 });
+  });
+  footer(s, false);
+})();
+
+// N3c — Metricas de match (IoU vs IOS)
+(function () {
+  const s = contentSlide();
+  kicker(s, "Nivel 3 · Métrica de match", C.gold); levelTag(s, 3);
+  title(s, "¿Son la misma caja? IoU vs IOS");
+  s.addText("Antes de fusionar hay que decidir si dos cajas son el mismo objeto. Dos maneras de medir el solape:",
+    { x: 0.7, y: 1.92, w: 12, h: 0.4, fontFace: BFONT, fontSize: 14, color: C.ink, margin: 0 });
+
+  function panel(x, name, formula, shadeCol, note, value, valueSub, valueCol) {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 2.45, w: 5.85, h: 3.2, fill: { color: C.white }, line: { color: C.line, width: 1 }, rectRadius: 0.08, shadow: mkShadow() });
+    s.addText(name, { x: x + 0.3, y: 2.6, w: 5.3, h: 0.4, fontFace: HFONT, fontSize: 19, bold: true, color: C.ink, margin: 0 });
+    s.addText(formula, { x: x + 0.3, y: 3.05, w: 3.0, h: 0.4, fontFace: "Consolas", fontSize: 13, bold: true, color: C.blue, margin: 0 });
+    // diagrama: caja grande con caja pequena contenida
+    const dx = x + 0.35, dy = 3.6, bw = 2.3, bh = 1.5;
+    if (shadeCol === C.blue) s.addShape(pres.shapes.RECTANGLE, { x: dx, y: dy, w: bw, h: bh, fill: { color: C.blue, transparency: 86 }, line: { color: C.navy, width: 2 } });
+    else s.addShape(pres.shapes.RECTANGLE, { x: dx, y: dy, w: bw, h: bh, fill: { color: C.white, transparency: 100 }, line: { color: C.navy, width: 2 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: dx + 0.35, y: dy + 0.4, w: 0.95, h: 0.7, fill: { color: shadeCol, transparency: 35 }, line: { color: shadeCol, width: 2 } });
+    s.addText("menor", { x: dx + 0.3, y: dy + 0.62, w: 1.05, h: 0.25, align: "center", fontFace: BFONT, fontSize: 8, bold: true, color: shadeCol, margin: 0 });
+    s.addText("grande", { x: dx + bw - 1.0, y: dy + bh - 0.28, w: 0.95, h: 0.22, align: "right", fontFace: BFONT, fontSize: 8, color: C.mute, margin: 0 });
+    // texto + valor
+    s.addText(note, { x: x + 2.95, y: 3.55, w: 2.65, h: 1.25, fontFace: BFONT, fontSize: 12, color: C.ink, margin: 0 });
+    s.addText(value, { x: x + 2.95, y: 4.85, w: 2.65, h: 0.45, fontFace: HFONT, fontSize: 22, bold: true, color: valueCol, margin: 0 });
+    s.addText(valueSub, { x: x + 2.95, y: 5.28, w: 2.65, h: 0.3, fontFace: BFONT, fontSize: 11, italic: true, color: valueCol, margin: 0 });
+  }
+  panel(0.7, "IoU — Intersection over Union", "IoU = ∩ / ∪", C.blue,
+    "Solape respecto al área total. Una caja pequeña dentro de una grande da un valor bajo.",
+    "IoU ≈ 0.25", "→ no las fusiona", C.yolo);
+  panel(6.8, "IOS — Intersection over Smaller", "IOS = ∩ / menor", C.sahi,
+    "Solape respecto a la caja MENOR. Si la pequeña está contenida, el valor es máximo.",
+    "IOS = 1.0", "→ sí las fusiona", C.sahi);
+
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.7, y: 5.85, w: 11.95, h: 0.82, fill: { color: C.navy }, line: { color: C.navy }, rectRadius: 0.06 });
+  s.addText([
+    { text: "Al rebanar, ", options: { color: "CADCFC" } },
+    { text: "un objeto suele quedar como caja pequeña dentro de otra", options: { bold: true, color: C.white } },
+    { text: " → IoU lo subestima, IOS lo capta. Por eso SAHI usa ", options: { color: "CADCFC" } },
+    { text: "IOS por defecto.", options: { bold: true, color: "9FE6C0" } },
+  ], { x: 1.0, y: 5.85, w: 11.4, h: 0.82, fontFace: BFONT, fontSize: 13, valign: "middle", margin: 0 });
+  footer(s, false);
+})();
+
 // N4 — modos + match
 (function () {
   const s = contentSlide();
