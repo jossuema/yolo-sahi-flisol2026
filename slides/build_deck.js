@@ -514,6 +514,44 @@ sectionDivider("04", "Configuraciones", "Escalando por complejidad: de un parám
   footer(s, false);
 })();
 
+// N4b — Modo combinado (deep dive)
+(function () {
+  const s = contentSlide();
+  kicker(s, "Nivel 4 · Modo combinado", C.gold); levelTag(s, 4);
+  title(s, "Lo mejor de ambos: global + slices");
+  s.addText("El modo combinado corre la imagen COMPLETA y los SLICES, y fusiona todo en un único resultado.",
+    { x: 0.7, y: 1.92, w: 12, h: 0.4, fontFace: BFONT, fontSize: 14, color: C.ink, margin: 0 });
+
+  function srcBox(x, y, t1, t2, col) {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w: 2.3, h: 0.85, fill: { color: col }, line: { color: col }, rectRadius: 0.06 });
+    s.addText([{ text: t1, options: { bold: true, fontSize: 12, color: C.white, breakLine: true } }, { text: t2, options: { fontSize: 9.5, color: "DCE8F5" } }],
+      { x: x + 0.1, y: y + 0.08, w: 2.1, h: 0.7, align: "center", valign: "middle", fontFace: BFONT, margin: 0 });
+  }
+  srcBox(1.0, 2.65, "Pasada GLOBAL", "imagen completa → grandes", C.blue);
+  s.addText("+", { x: 1.0, y: 3.5, w: 2.3, h: 0.4, align: "center", fontFace: HFONT, fontSize: 20, bold: true, color: C.mute, margin: 0 });
+  srcBox(1.0, 3.95, "Pasadas por SLICES", "mosaicos → pequeños", C.navy);
+  s.addShape(pres.shapes.LINE, { x: 3.3, y: 3.07, w: 0.25, h: 0, line: { color: C.ink, width: 1.5 } });
+  s.addShape(pres.shapes.LINE, { x: 3.3, y: 4.37, w: 0.25, h: 0, line: { color: C.ink, width: 1.5 } });
+  s.addShape(pres.shapes.LINE, { x: 3.55, y: 3.07, w: 0, h: 1.3, line: { color: C.ink, width: 1.5 } });
+  s.addShape(pres.shapes.LINE, { x: 3.55, y: 3.72, w: 0.6, h: 0, line: { color: C.ink, width: 2, endArrowType: "triangle" } });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 4.2, y: 3.25, w: 2.0, h: 0.95, fill: { color: C.sahi }, line: { color: C.sahi }, rectRadius: 0.06, shadow: mkShadow() });
+  s.addText([{ text: "Merge (NMM · IOS)", options: { bold: true, fontSize: 12, color: C.white, breakLine: true } }, { text: "grandes + pequeños", options: { fontSize: 10, color: "DFF3E7" } }],
+    { x: 4.25, y: 3.3, w: 1.9, h: 0.8, align: "center", valign: "middle", fontFace: BFONT, margin: 0 });
+
+  const rows = [
+    [{ text: "Modo", options: { bold: true, color: C.white, fill: { color: C.navy } } }, { text: "Pequeños", options: { bold: true, color: C.white, fill: { color: C.navy } } }, { text: "Grandes", options: { bold: true, color: C.white, fill: { color: C.navy } } }, { text: "Velocidad", options: { bold: true, color: C.white, fill: { color: C.navy } } }],
+    ["Sliced", "✓ ✓", "~", "media"],
+    ["Standard", "✗", "✓ ✓", "rápida"],
+    [{ text: "Combinado", options: { bold: true, fill: { color: "E3F2EA" } } }, { text: "✓ ✓", options: { fill: { color: "E3F2EA" } } }, { text: "✓ ✓", options: { fill: { color: "E3F2EA" } } }, { text: "lenta", options: { fill: { color: "E3F2EA" } } }],
+  ];
+  s.addTable(rows, { x: 6.7, y: 2.65, w: 5.95, colW: [1.9, 1.5, 1.3, 1.25], rowH: [0.45, 0.55, 0.55, 0.55], fontFace: BFONT, fontSize: 13, color: C.ink, align: "center", valign: "middle", border: { type: "solid", pt: 1, color: C.line } });
+  s.addText("Combinado = cobertura total (cualquier tamaño), a cambio de la pasada global + N slices.",
+    { x: 6.7, y: 5.15, w: 5.95, h: 0.7, fontFace: BFONT, fontSize: 12.5, italic: true, color: C.mute, margin: 0 });
+  s.addText([{ text: "Se activa con  ", options: { color: C.ink } }, { text: "perform_standard_pred=True", options: { fontFace: "Consolas", bold: true, color: C.navy } }],
+    { x: 0.7, y: 5.55, w: 6, h: 0.4, fontFace: BFONT, fontSize: 13, margin: 0 });
+  footer(s, false);
+})();
+
 // N5 — segmentacion
 (function () {
   const s = contentSlide();
@@ -563,6 +601,78 @@ sectionDivider("04", "Configuraciones", "Escalando por complejidad: de un parám
 // ============================================================
 // SECCION 5 — Resultados
 // ============================================================
+// N6b — entrenar es distinto
+(function () {
+  const s = contentSlide();
+  kicker(s, "Nivel 6 · Entrenar para SAHI", C.gold); levelTag(s, 6);
+  title(s, "Entrenar para SAHI es distinto");
+  s.addText("En inferencia el modelo NO ve la imagen completa: ve SLICES a resolución nativa. El entrenamiento debería verlos también.",
+    { x: 0.7, y: 1.92, w: 12, h: 0.45, fontFace: BFONT, fontSize: 14, color: C.ink, margin: 0 });
+
+  function col(x, head, headcol, para, srcLabel, note) {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 2.6, w: 5.85, h: 3.45, fill: { color: C.white }, line: { color: headcol, width: 1.5 }, rectRadius: 0.08, shadow: mkShadow() });
+    s.addShape(pres.shapes.RECTANGLE, { x, y: 2.6, w: 5.85, h: 0.7, fill: { color: headcol }, line: { color: headcol } });
+    s.addText(head, { x: x + 0.25, y: 2.6, w: 5.35, h: 0.7, valign: "middle", fontFace: HFONT, fontSize: 17, bold: true, color: C.white, margin: 0 });
+    s.addText(para, { x: x + 0.3, y: 3.45, w: 5.25, h: 0.8, fontFace: BFONT, fontSize: 13.5, color: C.ink, margin: 0 });
+    const dy = 4.55;
+    s.addShape(pres.shapes.RECTANGLE, { x: x + 0.55, y: dy, w: 1.5, h: 0.95, fill: { color: C.panel }, line: { color: C.mute, width: 1 } });
+    s.addText(srcLabel, { x: x + 0.55, y: dy + 0.33, w: 1.5, h: 0.3, align: "center", fontFace: BFONT, fontSize: 10, color: C.ink, margin: 0 });
+    s.addShape(pres.shapes.LINE, { x: x + 2.15, y: dy + 0.475, w: 0.5, h: 0, line: { color: C.ink, width: 2, endArrowType: "triangle" } });
+    s.addShape(pres.shapes.RECTANGLE, { x: x + 2.75, y: dy + 0.2, w: 0.75, h: 0.55, fill: { color: C.panel }, line: { color: headcol, width: 1.5 } });
+    s.addText("640", { x: x + 2.75, y: dy + 0.33, w: 0.75, h: 0.3, align: "center", fontFace: BFONT, fontSize: 9, color: C.mute, margin: 0 });
+    s.addText(note, { x: x + 3.7, y: dy + 0.1, w: 1.95, h: 0.85, valign: "middle", fontFace: BFONT, fontSize: 11.5, italic: true, bold: true, color: headcol, margin: 0 });
+  }
+  col(0.7, "YOLO normal", C.yolo, "Entrenas con imágenes completas reescaladas a 640.",
+    "imagen completa", "objeto diminuto → se pierde");
+  col(6.8, "YOLO + SAHI (bien)", C.sahi, "Entrenas con SLICES: el objeto llega grande al modelo.",
+    "slice nativo", "objeto grande → se detecta");
+  s.addText("Entrenar con imágenes completas pero inferir con slices = desajuste de escala (train ≠ test). El sliced fine-tuning lo cierra.",
+    { x: 0.7, y: 6.2, w: 12, h: 0.5, fontFace: BFONT, fontSize: 13, bold: true, color: C.navy, align: "center", margin: 0 });
+  footer(s, false);
+})();
+
+// N6c — receta sliced fine-tuning
+(function () {
+  const s = contentSlide();
+  kicker(s, "Nivel 6 · Receta", C.gold); levelTag(s, 6);
+  title(s, "Receta: sliced fine-tuning");
+  const steps = [
+    ["1", "Corta el dataset en slices", "con el MISMO slice_size y overlap que usarás al inferir."],
+    ["2", "Entrena con imgsz = tamaño de slice", "slices de 640 → entrena a imgsz 640."],
+    ["3", "Mezcla slices + imágenes completas", "para que rinda también en la pasada global (combinado)."],
+    ["4", "Infiere con la MISMA config", "mismo slice / overlap / postproceso."],
+  ];
+  let y = 2.25;
+  steps.forEach(([n, t, d]) => {
+    s.addShape(pres.shapes.OVAL, { x: 0.7, y, w: 0.68, h: 0.68, fill: { color: C.sahi }, line: { color: C.sahi } });
+    s.addText(n, { x: 0.7, y, w: 0.68, h: 0.68, align: "center", valign: "middle", fontFace: HFONT, fontSize: 19, bold: true, color: C.white, margin: 0 });
+    s.addText([{ text: t, options: { bold: true, fontSize: 15, color: C.ink, breakLine: true } }, { text: d, options: { fontSize: 12, color: C.mute } }],
+      { x: 1.55, y: y - 0.02, w: 6.7, h: 0.75, valign: "middle", fontFace: BFONT, margin: 0 });
+    y += 0.9;
+  });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.5, y: 2.25, w: 4.15, h: 2.45, fill: { color: C.navy }, line: { color: C.navy }, rectRadius: 0.06 });
+  s.addText([
+    { text: "from sahi.slicing import slice_coco", options: { color: "9FE6C0", breakLine: true } },
+    { text: "slice_coco(", options: { color: C.white, breakLine: true } },
+    { text: "  coco_annotation_file_path=...,", options: { color: "CADCFC", breakLine: true } },
+    { text: "  image_dir=..., output_dir=...,", options: { color: "CADCFC", breakLine: true } },
+    { text: "  slice_height=640, slice_width=640,", options: { color: "CADCFC", breakLine: true } },
+    { text: "  overlap_height_ratio=0.2,", options: { color: "CADCFC", breakLine: true } },
+    { text: "  overlap_width_ratio=0.2)", options: { color: "CADCFC", breakLine: true } },
+    { text: "# luego: yolo train data=sliced.yaml", options: { color: "9FB3C8" } },
+  ], { x: 8.7, y: 2.4, w: 3.8, h: 2.15, fontFace: "Consolas", fontSize: 10, valign: "top", margin: 0 });
+  s.addText("Tips", { x: 8.5, y: 4.9, w: 4.15, h: 0.35, fontFace: HFONT, fontSize: 15, bold: true, color: C.ink, margin: 0 });
+  s.addText([
+    { text: "Conserva algunos slices sin objetos (negativos) → menos falsos positivos.", options: { bullet: true, breakLine: true } },
+    { text: "Usa overlap al cortar para no perder objetos en bordes.", options: { bullet: true, breakLine: true } },
+    { text: "Evalúa con la misma config de slicing.", options: { bullet: true } },
+  ], { x: 8.5, y: 5.25, w: 4.15, h: 1.4, fontFace: BFONT, fontSize: 11, color: C.ink, paraSpaceAfter: 5, margin: 0 });
+  s.addText([{ text: "Atajo CLI:  ", options: { bold: true, color: C.ink } }, { text: "sahi coco slice --slice_size 640 ...", options: { fontFace: "Consolas", color: C.navy } }],
+    { x: 0.7, y: 5.95, w: 7.5, h: 0.4, fontFace: BFONT, fontSize: 12, margin: 0 });
+  footnote(s, "El fine-tuning estándar ya funciona; el sliced fine-tuning exprime el AP_small al máximo.");
+  footer(s, false);
+})();
+
 sectionDivider("05", "Resultados", "Lo que ganamos, medido contra el ground truth");
 
 // mAP global
