@@ -91,6 +91,11 @@
 - **Combinado (full + sliced)**: corre ambos y fusiona → cubre objetos grandes Y pequeños. Lo más robusto, lo más lento.
 - En código: `get_prediction()` vs `get_sliced_prediction()`.
 
+### Slide 11b — Modo combinado en profundidad
+- Diagrama: pasada **global** (objetos grandes) + pasadas por **slices** (objetos pequeños) → **merge** (NMM/IOS) → todo.
+- Tabla de cobertura por tamaño: Sliced (pequeños✓, grandes~), Standard (pequeños✗, grandes✓), Combinado (ambos✓, lento).
+- Se activa con `perform_standard_pred=True`. Úsalo cuando hay tamaños muy variados en la misma escena.
+
 ### Slide 12 — El paso crítico: POSTPROCESAMIENTO (fusión)
 - Problema: con solape, **el mismo objeto se detecta varias veces** (en slices vecinos y en la pasada completa).
 - Hay que fusionar esas cajas duplicadas. SAHI ofrece 3 estrategias:
@@ -190,6 +195,18 @@
 ---
 
 ## BLOQUE 5 — Llevándolo a producción (4 min)
+
+### Slide 21b — Entrenar para SAHI es distinto
+- En inferencia el modelo ve **slices a resolución nativa**, no la imagen completa reescalada.
+- Entrenar con imágenes completas + inferir con slices = **desajuste de escala (train ≠ test)**.
+- Solución: **sliced fine-tuning** — entrenar también con slices para cerrar la brecha.
+
+### Slide 21c — Receta: sliced fine-tuning
+1. Cortar el dataset en slices (`slice_coco` / `sahi coco slice`) con el **mismo** slice/overlap que en inferencia.
+2. Entrenar con `imgsz` = tamaño de slice (p. ej. 640).
+3. Mezclar slices + imágenes completas para que rinda también en el modo combinado.
+4. Inferir con la **misma** config de slicing.
+- Tips: conservar slices negativos (menos falsos positivos), overlap al cortar, evaluar con la misma config.
 
 ### Slide 22 — Optimizaciones prácticas
 - Ajustar tamaño de slice al tamaño típico de objeto.
